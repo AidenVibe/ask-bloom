@@ -52,6 +52,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Family theme colors
+				'warm-coral': 'hsl(var(--warm-coral))',
+				'soft-peach': 'hsl(var(--soft-peach))',
+				'warm-gray': 'hsl(var(--warm-gray))',
+				'cream': 'hsl(var(--cream))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
