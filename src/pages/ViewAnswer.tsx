@@ -247,61 +247,63 @@ const ViewAnswer = () => {
                           )}
                         </div>
                       </div>
-                    ) : !question.child_followup_text && !accessToken && user && question.child_user_id === user.id && (
-                      <div className="space-y-4">
-                        <div className="text-center">
-                          <p className="text-warm-gray mb-4">
-                            부모님의 답변에 대해 더 궁금한 점이나 감사 인사를 전해보세요
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowFollowupForm(true)}
-                          >
-                            <Reply className="w-4 h-4 mr-2" />
-                            꼬리 답변 남기기
-                          </Button>
-                        </div>
-                        {!showFollowupForm ? null : (
-                          <div className="space-y-4">
-                            <div>
-                              <label className="text-sm font-medium text-foreground mb-2 block">
-                                꼬리 답변
-                              </label>
-                              <Textarea
-                                value={followupText}
-                                onChange={(e) => setFollowupText(e.target.value)}
-                                placeholder="부모님께 더 궁금한 점이나 감사 인사를 남겨보세요..."
-                                className="min-h-[100px]"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <Button
-                                onClick={handleFollowupSubmit}
-                                disabled={!followupText.trim() || isSubmittingFollowup}
-                                className="flex-1"
-                              >
-                                {isSubmittingFollowup ? (
-                                  "전송 중..."
-                                ) : (
-                                  <>
-                                    <Send className="w-4 h-4 mr-2" />
-                                    꼬리 답변 전송
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                variant="outline"
-                                onClick={() => {
-                                  setShowFollowupForm(false);
-                                  setFollowupText("");
-                                }}
-                              >
-                                취소
-                              </Button>
-                            </div>
+                    ) : (
+                      !accessToken && user && question.child_user_id === user.id && (
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            <p className="text-warm-gray mb-4">
+                              부모님의 답변에 대해 더 궁금한 점이나 감사 인사를 전해보세요
+                            </p>
+                            <Button
+                              variant="outline"
+                              onClick={() => setShowFollowupForm(true)}
+                            >
+                              <Reply className="w-4 h-4 mr-2" />
+                              꼬리 답변 남기기
+                            </Button>
                           </div>
-                        )}
-                      </div>
+                          {showFollowupForm && (
+                            <div className="space-y-4">
+                              <div>
+                                <label className="text-sm font-medium text-foreground mb-2 block">
+                                  꼬리 답변
+                                </label>
+                                <Textarea
+                                  value={followupText}
+                                  onChange={(e) => setFollowupText(e.target.value)}
+                                  placeholder="부모님께 더 궁금한 점이나 감사 인사를 남겨보세요..."
+                                  className="min-h-[100px]"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  onClick={handleFollowupSubmit}
+                                  disabled={!followupText.trim() || isSubmittingFollowup}
+                                  className="flex-1"
+                                >
+                                  {isSubmittingFollowup ? (
+                                    "전송 중..."
+                                  ) : (
+                                    <>
+                                      <Send className="w-4 h-4 mr-2" />
+                                      꼬리 답변 전송
+                                    </>
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => {
+                                    setShowFollowupForm(false);
+                                    setFollowupText("");
+                                  }}
+                                >
+                                  취소
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )
                     )}
                   </div>
                 )}
