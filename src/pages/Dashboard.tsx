@@ -1,16 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuestionList } from "@/components/QuestionCard";
 import { DiscoveryGallery } from "@/components/DiscoveryCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp } from "lucide-react";
+import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp, Send } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalQuestions: 0,
+    answeredQuestions: 0,
+    newDiscoveries: 0,
+    consecutiveDays: 0
+  });
+  const [questions, setQuestions] = useState([]);
+  const [hasQuestions, setHasQuestions] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -21,6 +31,72 @@ const Dashboard = () => {
       }
     }
   }, [user, profile, loading, navigate]);
+
+  useEffect(() => {
+    if (user && profile) {
+      fetchQuestions();
+    }
+  }, [user, profile]);
+
+  const fetchQuestions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('child_user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setQuestions(data || []);
+      setHasQuestions(data && data.length > 0);
+      
+      // 통계 계산
+      const totalQuestions = data?.length || 0;
+      const answeredQuestions = data?.filter(q => q.answer_text).length || 0;
+      
+      setStats({
+        totalQuestions,
+        answeredQuestions,
+        newDiscoveries: answeredQuestions, // 간단히 답변된 질문 수로 설정
+        consecutiveDays: totalQuestions > 0 ? Math.min(totalQuestions, 7) : 0
+      });
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      toast({
+        title: "질문을 불러오는 중 오류가 발생했습니다",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSendFirstQuestion = async () => {
+    try {
+      // 첫 번째 질문 생성
+      const { error } = await supabase
+        .from('questions')
+        .insert({
+          child_user_id: user?.id,
+          question_text: `${profile.name}님의 첫 번째 질문: 어머니가 가장 좋아하시는 음식은 무엇인가요?`,
+          status: 'sent'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "첫 번째 질문을 전송했습니다! 📱",
+        description: "부모님께 곧 질문이 전달됩니다"
+      });
+
+      fetchQuestions(); // 목록 새로고침
+    } catch (error) {
+      console.error('Error sending question:', error);
+      toast({
+        title: "질문 전송 중 오류가 발생했습니다",
+        variant: "destructive"
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -49,6 +125,32 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        {/* First Question CTA */}
+        {!hasQuestions && (
+          <Card className="p-8 mb-8 border-warm-coral/30 bg-gradient-to-r from-warm-coral/10 to-soft-peach/20">
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-warm-coral/20 rounded-full flex items-center justify-center mx-auto">
+                <Send className="w-10 h-10 text-warm-coral" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">첫 번째 질문을 보내보세요!</h3>
+                <p className="text-warm-gray mb-6">
+                  부모님과의 첫 대화를 시작해보세요. 따뜻한 질문으로 새로운 이야기를 발견할 수 있어요.
+                </p>
+                <Button 
+                  variant="warm" 
+                  size="lg"
+                  onClick={handleSendFirstQuestion}
+                  className="text-lg px-8 py-3"
+                >
+                  <Send className="w-5 h-5 mr-2" />
+                  첫 질문 보내기
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="p-6 border-warm-coral/20">
@@ -57,7 +159,7 @@ const Dashboard = () => {
                 <MessageCircle className="w-6 h-6 text-warm-coral" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-foreground">15</div>
+                <div className="text-2xl font-bold text-foreground">{stats.totalQuestions}</div>
                 <div className="text-sm text-warm-gray">총 질문</div>
               </div>
             </div>
@@ -69,7 +171,7 @@ const Dashboard = () => {
                 <Calendar className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-foreground">12</div>
+                <div className="text-2xl font-bold text-foreground">{stats.answeredQuestions}</div>
                 <div className="text-sm text-warm-gray">답변 완료</div>
               </div>
             </div>
@@ -81,7 +183,7 @@ const Dashboard = () => {
                 <Sparkles className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-foreground">8</div>
+                <div className="text-2xl font-bold text-foreground">{stats.newDiscoveries}</div>
                 <div className="text-sm text-warm-gray">새로운 발견</div>
               </div>
             </div>
@@ -93,7 +195,7 @@ const Dashboard = () => {
                 <TrendingUp className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-foreground">7일</div>
+                <div className="text-2xl font-bold text-foreground">{stats.consecutiveDays}일</div>
                 <div className="text-sm text-warm-gray">연속 대화</div>
               </div>
             </div>

@@ -77,6 +77,45 @@ export type Database = {
         }
         Relationships: []
       }
+      questions: {
+        Row: {
+          answer_text: string | null
+          answered_at: string | null
+          child_user_id: string
+          created_at: string
+          id: string
+          parent_user_id: string | null
+          question_text: string
+          sent_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer_text?: string | null
+          answered_at?: string | null
+          child_user_id: string
+          created_at?: string
+          id?: string
+          parent_user_id?: string | null
+          question_text: string
+          sent_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer_text?: string | null
+          answered_at?: string | null
+          child_user_id?: string
+          created_at?: string
+          id?: string
+          parent_user_id?: string | null
+          question_text?: string
+          sent_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
