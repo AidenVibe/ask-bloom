@@ -47,7 +47,13 @@ export const useKakaoShare = () => {
     }
 
     // 꼬리답변의 경우 오늘의 대화 페이지로 이동하도록 URL 수정
-    const conversationsUrl = answerUrl.replace('/view-answer', '/conversations');
+    console.log('Original answerUrl:', answerUrl);
+    
+    // URL에서 기본 도메인을 가져와서 /conversations 경로로 새로 구성
+    const url = new URL(answerUrl);
+    const conversationsUrl = `${url.origin}/conversations${url.search}`;
+    
+    console.log('Modified conversationsUrl:', conversationsUrl);
 
     window.Kakao.Share.sendDefault({
       objectType: 'text',
