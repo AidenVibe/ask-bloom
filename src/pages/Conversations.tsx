@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageCircle, AlertCircle, Heart, Calendar, ArrowLeft } from "lucide-react";
+import { MessageCircle, AlertCircle, Heart, Calendar, ArrowLeft, Reply } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -30,7 +30,7 @@ const Conversations = () => {
         // 해당 access token과 연관된 질문들 조회 (날짜 제한 없음)
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
-          .select('*')
+          .select('*, child_followup_text, child_followup_sent_at')
           .eq('parent_access_token', accessToken)
           .order('created_at', { ascending: false });
 
@@ -168,6 +168,28 @@ const Conversations = () => {
                         {conversation.answered_at && (
                           <div className="text-xs text-warm-gray mt-2">
                             {format(new Date(conversation.answered_at), "M월 d일 HH:mm", { locale: ko })}에 답변함
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Follow-up Response from Child */}
+                  {conversation.child_followup_text && (
+                    <div className="flex items-start gap-4 bg-blue-50 p-4 rounded-lg">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Reply className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm text-blue-600 font-medium mb-2">
+                          💬 {childName}님의 꼬리 답변
+                        </div>
+                        <p className="text-foreground leading-relaxed">
+                          {conversation.child_followup_text}
+                        </p>
+                        {conversation.child_followup_sent_at && (
+                          <div className="text-xs text-warm-gray mt-2">
+                            {format(new Date(conversation.child_followup_sent_at), "M월 d일 HH:mm", { locale: ko })}에 전송함
                           </div>
                         )}
                       </div>
