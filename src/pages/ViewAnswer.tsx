@@ -48,7 +48,8 @@ const ViewAnswer = () => {
 
         if (questionError) throw questionError;
 
-        if (!questionData.answer_text) {
+        // 부모 액세스 토큰이 있으면 답변이 없어도 질문을 보여줌
+        if (!questionData.answer_text && !accessToken) {
           setError("아직 답변이 오지 않았습니다.");
           setLoading(false);
           return;
@@ -82,9 +83,9 @@ const ViewAnswer = () => {
 
       if (error) throw error;
 
-      // 카카오톡으로 꼬리답변 알림 전송
-      if (question.answer_text && accessToken) {
-        const answerUrl = `${window.location.origin}/view-answer?id=${questionId}&token=${accessToken}`;
+      // 카카오톡으로 꼬리답변 알림 전송 (답변이 있을 때만)
+      if (question.answer_text && question.parent_access_token) {
+        const answerUrl = `${window.location.origin}/view-answer?id=${questionId}&token=${question.parent_access_token}`;
         shareFollowUpToKakao(
           question.question_text,
           question.answer_text,
@@ -198,12 +199,26 @@ const ViewAnswer = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground text-lg leading-relaxed">
-                  {question.answer_text}
-                </p>
+                {question.answer_text ? (
+                  <p className="text-foreground text-lg leading-relaxed">
+                    {question.answer_text}
+                  </p>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-warm-coral/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageCircle className="w-8 h-8 text-warm-coral/50" />
+                    </div>
+                    <p className="text-warm-gray text-lg">
+                      아직 답변이 오지 않았습니다
+                    </p>
+                    <p className="text-warm-gray/70 text-sm mt-2">
+                      답변이 도착하면 카카오톡으로 알려드릴게요!
+                    </p>
+                  </div>
+                )}
 
                 {/* Parent View: Show followup response if exists */}
-                {accessToken && question.child_followup_text && (
+                {accessToken && question.child_followup_text && question.answer_text && (
                   <div className="mt-8 border-t pt-6">
                     <div className="flex items-start gap-4 bg-blue-50 p-4 rounded-lg">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -227,7 +242,7 @@ const ViewAnswer = () => {
                 )}
 
                 {/* Child Follow-up Response (when accessed by child) */}
-                {user && question.child_user_id === user.id && (
+                {user && question.child_user_id === user.id && question.answer_text && (
                   <div className="mt-8 border-t pt-6">
                     {question.child_followup_text ? (
                       <div className="flex items-start gap-4 bg-blue-50 p-4 rounded-lg">
