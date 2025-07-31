@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Heart, Mic, Send, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AnswerFormProps {
   question: string;
@@ -17,6 +19,11 @@ export const AnswerForm = ({
   const [answer, setAnswer] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const questionId = searchParams.get('q');
+  const accessToken = searchParams.get('t');
 
   const exampleAnswers = [
     "김치찌개를 제일 좋아해요. 특히 묵은 김치로 끓인 것을 좋아하시죠.",
@@ -38,17 +45,51 @@ export const AnswerForm = ({
       return;
     }
 
+    if (!questionId || !accessToken) {
+      toast({
+        title: "오류가 발생했습니다",
+        description: "유효하지 않은 링크입니다",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // 실제로는 여기서 API 호출
-    setTimeout(() => {
+    try {
+      // 질문에 답변 저장
+      const { error } = await supabase
+        .from('questions')
+        .update({
+          answer_text: answer.trim(),
+          answered_at: new Date().toISOString(),
+          status: 'answered'
+        })
+        .eq('id', questionId)
+        .eq('parent_access_token', accessToken);
+
+      if (error) throw error;
+
       toast({
         title: "답변이 전송되었습니다! 💌",
         description: "소중한 이야기를 공유해주셔서 감사해요"
       });
+      
+      // 답변 후 질문&답변 목록 페이지로 이동
+      setTimeout(() => {
+        navigate(`/conversations?t=${accessToken}`);
+      }, 1500);
+      
+    } catch (error) {
+      console.error('답변 저장 실패:', error);
+      toast({
+        title: "답변 전송에 실패했습니다",
+        description: "다시 시도해주세요",
+        variant: "destructive"
+      });
+    } finally {
       setIsSubmitting(false);
-      setAnswer("");
-    }, 1500);
+    }
   };
 
   const toggleRecording = () => {
