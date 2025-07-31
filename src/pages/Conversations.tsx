@@ -25,19 +25,17 @@ const Conversations = () => {
       }
 
       try {
-        // 해당 access token과 연관된 오늘의 질문들 조회
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
+        console.log('Conversations 페이지 - 토큰으로 질문 조회:', accessToken);
+        
+        // 해당 access token과 연관된 질문들 조회 (날짜 제한 없음)
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
           .select('*')
           .eq('parent_access_token', accessToken)
-          .gte('created_at', today.toISOString())
-          .lt('created_at', tomorrow.toISOString())
           .order('created_at', { ascending: false });
+
+        console.log('조회된 질문 데이터:', questionsData);
+        console.log('질문 조회 에러:', questionsError);
 
         if (questionsError) throw questionsError;
 
