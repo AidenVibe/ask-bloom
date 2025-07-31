@@ -28,13 +28,13 @@ export const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="warm" size="xl" className="flex-1 sm:flex-none" onClick={() => window.location.href = '/onboarding'}>
+              <Button variant="warm" size="xl" className="flex-1 sm:flex-none" onClick={() => window.location.href = '/auth'}>
                 <MessageCircle className="w-5 h-5" />
                 시작하기
               </Button>
-              <Button variant="soft" size="xl" className="flex-1 sm:flex-none" onClick={() => window.location.href = '/dashboard'}>
+              <Button variant="soft" size="xl" className="flex-1 sm:flex-none" onClick={() => window.location.href = '/auth'}>
                 <BookOpen className="w-5 h-5" />
-                데모 보기
+                로그인
               </Button>
             </div>
 
