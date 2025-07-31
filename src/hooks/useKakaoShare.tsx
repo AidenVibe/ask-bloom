@@ -10,7 +10,7 @@ export const useKakaoShare = () => {
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       // 개발용 키 - 실제 사용 시에는 카카오 개발자 센터에서 발급받은 JavaScript 키를 사용하세요
-      window.Kakao.init('0d86326ffebff95456eaf85ca6b8252e');
+      window.Kakao.init(0d86326ffebff95456eaf85ca6b8252e);
       console.log('카카오 SDK 초기화 완료');
     }
   }, []);
