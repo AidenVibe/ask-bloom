@@ -77,6 +77,36 @@ export type Database = {
         }
         Relationships: []
       }
+      question_templates: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          question_text: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          question_text: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          question_text?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       questions: {
         Row: {
           answer_text: string | null

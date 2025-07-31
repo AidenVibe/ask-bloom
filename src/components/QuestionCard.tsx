@@ -1,11 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Heart, ArrowRight } from "lucide-react";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 interface QuestionCardProps {
   question: string;
   date: string;
   isAnswered: boolean;
+  answerText?: string;
   onAnswer?: () => void;
   onViewAnswer?: () => void;
 }
@@ -14,9 +17,12 @@ export const QuestionCard = ({
   question, 
   date, 
   isAnswered, 
+  answerText,
   onAnswer, 
   onViewAnswer 
 }: QuestionCardProps) => {
+  const formattedDate = format(new Date(date), "yyyy년 M월 d일", { locale: ko });
+
   return (
     <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all duration-300">
       <div className="space-y-4">
@@ -24,7 +30,7 @@ export const QuestionCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-warm-gray">
             <Calendar className="w-4 h-4" />
-            <span>{date}</span>
+            <span>{formattedDate}</span>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
             isAnswered 
@@ -45,6 +51,12 @@ export const QuestionCard = ({
               <h3 className="text-lg font-semibold text-foreground leading-relaxed">
                 {question}
               </h3>
+              {isAnswered && answerText && (
+                <div className="mt-4 p-4 bg-warm-coral/5 rounded-lg border-l-4 border-warm-coral/30">
+                  <p className="text-sm text-warm-gray mb-2">💕 부모님의 답변</p>
+                  <p className="text-foreground leading-relaxed">{answerText}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -58,7 +70,7 @@ export const QuestionCard = ({
               onClick={onViewAnswer}
               className="w-full"
             >
-              답변 보기
+              상세 보기
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
@@ -68,7 +80,7 @@ export const QuestionCard = ({
               onClick={onAnswer}
               className="w-full"
             >
-              답변하기
+              답변 확인하기
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
@@ -78,39 +90,42 @@ export const QuestionCard = ({
   );
 };
 
-// 질문 목록 컴포넌트
-export const QuestionList = () => {
-  const questions = [
-    {
-      id: 1,
-      question: "어머니가 가장 좋아하시는 음식은 무엇인가요?",
-      date: "2024년 1월 30일",
-      isAnswered: false
-    },
-    {
-      id: 2,
-      question: "아버지가 젊었을 때 가장 즐겨 들었던 음악은?",
-      date: "2024년 1월 29일",
-      isAnswered: true
-    },
-    {
-      id: 3,
-      question: "부모님이 처음 만났을 때의 첫인상은 어땠나요?",
-      date: "2024년 1월 28일",
-      isAnswered: true
-    }
-  ];
+// Dynamic QuestionList component that receives questions as props
+interface QuestionListProps {
+  questions: Array<{
+    id: string;
+    question_text: string;
+    sent_at: string;
+    answer_text?: string;
+    answered_at?: string;
+    status: string;
+  }>;
+}
+
+export const QuestionList = ({ questions }: QuestionListProps) => {
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-20 h-20 bg-warm-coral/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Clock className="w-10 h-10 text-warm-coral/60" />
+        </div>
+        <h3 className="text-lg font-medium text-foreground mb-2">아직 보낸 질문이 없어요</h3>
+        <p className="text-warm-gray">첫 번째 질문을 보내서 부모님과의 대화를 시작해보세요!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {questions.map((q) => (
         <QuestionCard
           key={q.id}
-          question={q.question}
-          date={q.date}
-          isAnswered={q.isAnswered}
-          onAnswer={() => console.log("답변하기", q.id)}
-          onViewAnswer={() => console.log("답변 보기", q.id)}
+          question={q.question_text}
+          date={q.sent_at}
+          isAnswered={!!q.answer_text}
+          answerText={q.answer_text}
+          onAnswer={() => console.log(`답변 확인: ${q.id}`)}
+          onViewAnswer={() => console.log(`상세 보기: ${q.id}`)}
         />
       ))}
     </div>

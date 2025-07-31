@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuestionList } from "@/components/QuestionCard";
+import { QuestionSelector } from "@/components/QuestionSelector";
 import { DiscoveryGallery } from "@/components/DiscoveryCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp, Send } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,6 +23,7 @@ const Dashboard = () => {
   });
   const [questions, setQuestions] = useState([]);
   const [hasQuestions, setHasQuestions] = useState(false);
+  const [showQuestionSelector, setShowQuestionSelector] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -70,32 +73,9 @@ const Dashboard = () => {
     }
   };
 
-  const handleSendFirstQuestion = async () => {
-    try {
-      // 첫 번째 질문 생성
-      const { error } = await supabase
-        .from('questions')
-        .insert({
-          child_user_id: user?.id,
-          question_text: `${profile.name}님의 첫 번째 질문: 어머니가 가장 좋아하시는 음식은 무엇인가요?`,
-          status: 'sent'
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "첫 번째 질문을 전송했습니다! 📱",
-        description: "부모님께 곧 질문이 전달됩니다"
-      });
-
-      fetchQuestions(); // 목록 새로고침
-    } catch (error) {
-      console.error('Error sending question:', error);
-      toast({
-        title: "질문 전송 중 오류가 발생했습니다",
-        variant: "destructive"
-      });
-    }
+  const handleQuestionSent = () => {
+    setShowQuestionSelector(false);
+    fetchQuestions(); // 목록 새로고침
   };
 
   if (loading) {
@@ -137,15 +117,21 @@ const Dashboard = () => {
                 <p className="text-warm-gray mb-6">
                   부모님과의 첫 대화를 시작해보세요. 따뜻한 질문으로 새로운 이야기를 발견할 수 있어요.
                 </p>
-                <Button 
-                  variant="warm" 
-                  size="lg"
-                  onClick={handleSendFirstQuestion}
-                  className="text-lg px-8 py-3"
-                >
-                  <Send className="w-5 h-5 mr-2" />
-                  첫 질문 보내기
-                </Button>
+                <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="warm" 
+                      size="lg"
+                      className="text-lg px-8 py-3"
+                    >
+                      <Send className="w-5 h-5 mr-2" />
+                      첫 질문 보내기
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <QuestionSelector onQuestionSent={handleQuestionSent} />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </Card>
@@ -216,13 +202,22 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="questions" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
-              <Button variant="warm" size="sm">
-                새 질문 보내기
-              </Button>
-            </div>
-            <QuestionList />
+            {hasQuestions && (
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
+                <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
+                  <DialogTrigger asChild>
+                    <Button variant="warm" size="sm">
+                      새 질문 보내기
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <QuestionSelector onQuestionSent={handleQuestionSent} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
+            <QuestionList questions={questions} />
           </TabsContent>
 
           <TabsContent value="discoveries" className="space-y-6">
@@ -234,17 +229,24 @@ const Dashboard = () => {
         <div className="mt-12">
           <h3 className="text-xl font-semibold text-foreground mb-6">빠른 실행</h3>
           <div className="grid md:grid-cols-3 gap-6">
-            <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-warm-coral/20 rounded-full flex items-center justify-center mx-auto">
-                  <Heart className="w-8 h-8 text-warm-coral" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground">즉시 질문하기</h4>
-                  <p className="text-sm text-warm-gray">지금 바로 새로운 질문을 보내세요</p>
-                </div>
-              </div>
-            </Card>
+            <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
+              <DialogTrigger asChild>
+                <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-warm-coral/20 rounded-full flex items-center justify-center mx-auto">
+                      <Heart className="w-8 h-8 text-warm-coral" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">즉시 질문하기</h4>
+                      <p className="text-sm text-warm-gray">지금 바로 새로운 질문을 보내세요</p>
+                    </div>
+                  </div>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <QuestionSelector onQuestionSent={handleQuestionSent} />
+              </DialogContent>
+            </Dialog>
 
             <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
               <div className="text-center space-y-4">
