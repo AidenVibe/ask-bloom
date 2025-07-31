@@ -46,19 +46,22 @@ export const useKakaoShare = () => {
       return;
     }
 
+    // 꼬리답변의 경우 오늘의 대화 페이지로 이동하도록 URL 수정
+    const conversationsUrl = answerUrl.replace('/view-answer', '/conversations');
+
     window.Kakao.Share.sendDefault({
       objectType: 'text',
       text: `💕 ${parentName}님의 답변에 꼬리 답변이 도착했어요!\n\n질문: "${question}"\n\n${parentName}님 답변: "${parentAnswer.length > 50 ? parentAnswer.substring(0, 50) + '...' : parentAnswer}"\n\n자녀 꼬리답변: "${childResponse.length > 50 ? childResponse.substring(0, 50) + '...' : childResponse}"\n\n전체 대화를 보시려면 아래 링크를 눌러주세요!`,
       link: {
-        mobileWebUrl: answerUrl,
-        webUrl: answerUrl,
+        mobileWebUrl: conversationsUrl,
+        webUrl: conversationsUrl,
       },
       buttons: [
         {
           title: '대화 보기',
           link: {
-            mobileWebUrl: answerUrl,
-            webUrl: answerUrl,
+            mobileWebUrl: conversationsUrl,
+            webUrl: conversationsUrl,
           },
         },
       ],
