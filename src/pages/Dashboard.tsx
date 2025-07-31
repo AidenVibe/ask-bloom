@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuestionList } from "@/components/QuestionCard";
 import { QuestionSelector } from "@/components/QuestionSelector";
-import { DiscoveryGallery } from "@/components/DiscoveryCard";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp, Send } from "lucide-react";
+import { MessageCircle, Settings, Calendar, Heart, TrendingUp, Send, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { DevSettings } from "@/components/DevSettings";
@@ -190,46 +189,29 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="questions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-white border border-warm-coral/20">
-            <TabsTrigger value="questions" className="data-[state=active]:bg-warm-coral data-[state=active]:text-white">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              질문 & 답변
-            </TabsTrigger>
-            <TabsTrigger value="discoveries" className="data-[state=active]:bg-warm-coral data-[state=active]:text-white">
-              <Sparkles className="w-4 h-4 mr-2" />
-              발견한 이야기
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="questions" className="space-y-6">
-            {hasQuestions && (
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
-                <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
-                  <DialogTrigger asChild>
-                    <Button variant="warm" size="sm">
-                      새 질문 보내기
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <QuestionSelector onQuestionSent={handleQuestionSent} />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            )}
-            <QuestionList questions={questions} />
-          </TabsContent>
-
-          <TabsContent value="discoveries" className="space-y-6">
-            <DiscoveryGallery />
-          </TabsContent>
-        </Tabs>
+        <div className="space-y-6">
+          {hasQuestions && (
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
+              <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
+                <DialogTrigger asChild>
+                  <Button variant="warm" size="sm">
+                    새 질문 보내기
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <QuestionSelector onQuestionSent={handleQuestionSent} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
+          <QuestionList questions={questions} />
+        </div>
 
         {/* Quick Actions */}
         <div className="mt-12">
           <h3 className="text-xl font-semibold text-foreground mb-6">빠른 실행</h3>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-1 gap-6 max-w-md">
             <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
               <DialogTrigger asChild>
                 <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
@@ -248,30 +230,6 @@ const Dashboard = () => {
                 <QuestionSelector onQuestionSent={handleQuestionSent} />
               </DialogContent>
             </Dialog>
-
-            <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                  <Calendar className="w-8 h-8 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground">월간 리포트</h4>
-                  <p className="text-sm text-warm-gray">이번 달 대화 요약을 확인하세요</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                  <Sparkles className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground">패밀리북 생성</h4>
-                  <p className="text-sm text-warm-gray">지금까지의 이야기를 책으로 만들어요</p>
-                </div>
-              </div>
-            </Card>
           </div>
         </div>
 

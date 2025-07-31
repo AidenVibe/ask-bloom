@@ -61,15 +61,28 @@ const Settings = () => {
         preferredTime: (profile as any)?.preferred_time || ""
       }));
 
-      // 부모 정보 로드
+      // 온보딩 데이터에서 부모 정보 먼저 확인
+      const onboardingData = (profile as any)?.onboarding_data;
+      if (onboardingData?.parentNickname) {
+        setFormData(prev => ({
+          ...prev,
+          parentInfo: {
+            name: onboardingData.parentNickname,
+            phone: onboardingData.parentContact || profile?.phone_number || "",
+            relationship: "parent" // 기본값
+          }
+        }));
+      }
+
+      // 부모 정보 테이블에서 관계 정보 로드 (있으면 업데이트)
       const { data: parentRelation, error } = await supabase
         .from('parent_child_relationships')
         .select('parent_name, parent_phone, relationship')
         .eq('child_user_id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        throw error;
+      if (error) {
+        console.error('Parent relation fetch error:', error);
       }
 
       if (parentRelation) {
@@ -107,18 +120,38 @@ const Settings = () => {
 
       // 부모 정보 업데이트 (있으면 업데이트, 없으면 생성)
       if (formData.parentInfo) {
-        const { error: relationError } = await supabase
+        // 먼저 기존 데이터 확인
+        const { data: existing } = await supabase
           .from('parent_child_relationships')
-          .upsert({
-            child_user_id: user?.id,
-            parent_name: formData.parentInfo.name,
-            parent_phone: formData.parentInfo.phone,
-            relationship: formData.parentInfo.relationship
-          }, {
-            onConflict: 'child_user_id'
-          });
+          .select('id')
+          .eq('child_user_id', user?.id)
+          .maybeSingle();
 
-        if (relationError) throw relationError;
+        if (existing) {
+          // 기존 데이터 업데이트
+          const { error: updateError } = await supabase
+            .from('parent_child_relationships')
+            .update({
+              parent_name: formData.parentInfo.name,
+              parent_phone: formData.parentInfo.phone,
+              relationship: formData.parentInfo.relationship
+            })
+            .eq('child_user_id', user?.id);
+
+          if (updateError) throw updateError;
+        } else {
+          // 새 데이터 생성
+          const { error: insertError } = await supabase
+            .from('parent_child_relationships')
+            .insert({
+              child_user_id: user?.id,
+              parent_name: formData.parentInfo.name,
+              parent_phone: formData.parentInfo.phone,
+              relationship: formData.parentInfo.relationship
+            });
+
+          if (insertError) throw insertError;
+        }
       }
 
       toast({
@@ -199,18 +232,19 @@ const Settings = () => {
             <h2 className="text-xl font-semibold text-foreground mb-4">부모 정보</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="parentName" className="text-base font-medium">이름</Label>
+                <Label htmlFor="parentName" className="text-base font-medium">애칭(성함)</Label>
                 <Input
                   id="parentName"
                   value={formData.parentInfo?.name || ""}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
                     parentInfo: {
-                      ...prev.parentInfo!,
-                      name: e.target.value
+                      name: e.target.value,
+                      phone: prev.parentInfo?.phone || "",
+                      relationship: prev.parentInfo?.relationship || "parent"
                     }
                   }))}
-                  placeholder="부모님 이름을 입력하세요"
+                  placeholder="부모님의 애칭 혹은 성함을 입력하세요"
                   className="h-12 text-lg border-warm-coral/30 focus:border-warm-coral"
                 />
               </div>
@@ -223,8 +257,9 @@ const Settings = () => {
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
                     parentInfo: {
-                      ...prev.parentInfo!,
-                      phone: e.target.value
+                      name: prev.parentInfo?.name || "",
+                      phone: e.target.value,
+                      relationship: prev.parentInfo?.relationship || "parent"
                     }
                   }))}
                   placeholder="010-1234-5678"
@@ -239,7 +274,8 @@ const Settings = () => {
                   onValueChange={(value) => setFormData(prev => ({
                     ...prev,
                     parentInfo: {
-                      ...prev.parentInfo!,
+                      name: prev.parentInfo?.name || "",
+                      phone: prev.parentInfo?.phone || "",
                       relationship: value
                     }
                   }))}
