@@ -248,22 +248,21 @@ const ViewAnswer = () => {
                           )}
                         </div>
                       </div>
-                    ) : (
+                    ) : !question.child_followup_text && (
                       <div className="space-y-4">
-                        {!showFollowupForm ? (
-                          <div className="text-center">
-                            <p className="text-warm-gray mb-4">
-                              부모님의 답변에 대해 더 궁금한 점이나 감사 인사를 전해보세요
-                            </p>
-                            <Button
-                              variant="outline"
-                              onClick={() => setShowFollowupForm(true)}
-                            >
-                              <Reply className="w-4 h-4 mr-2" />
-                              꼬리 답변 남기기
-                            </Button>
-                          </div>
-                        ) : (
+                        <div className="text-center">
+                          <p className="text-warm-gray mb-4">
+                            부모님의 답변에 대해 더 궁금한 점이나 감사 인사를 전해보세요
+                          </p>
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowFollowupForm(true)}
+                          >
+                            <Reply className="w-4 h-4 mr-2" />
+                            꼬리 답변 남기기
+                          </Button>
+                        </div>
+                        {!showFollowupForm ? null : (
                           <div className="space-y-4">
                             <div>
                               <label className="text-sm font-medium text-foreground mb-2 block">

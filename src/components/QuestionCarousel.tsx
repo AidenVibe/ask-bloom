@@ -123,21 +123,23 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
                                 <Reply className="w-3 h-3 mr-1" />
                                 꼬리 답변하기
                               </Button>
-                              {question.parent_access_token && (
-                                <>
-                                   <Button
-                                     variant="ghost"
-                                     size="sm"
-                                     className="h-8 px-3 text-xs"
-                                     onClick={() => handleKakaoShare(question)}
-                                   >
-                                     <MessageSquare className="w-3 h-3 mr-1" />
-                                     카카오톡
-                                   </Button>
-                                </>
-                              )}
                             </div>
                           </div>
+                        </div>
+                      )}
+                      
+                      {/* Kakao Share Button - Always show if token exists */}
+                      {question.parent_access_token && (
+                        <div className="flex justify-center pt-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-3 text-xs"
+                            onClick={() => handleKakaoShare(question)}
+                          >
+                            <MessageSquare className="w-3 h-3 mr-1" />
+                            카카오톡 공유
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -217,18 +219,6 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
                             <Reply className="w-4 h-4 mr-2" />
                             꼬리 답변하기
                           </Button>
-                          {question.parent_access_token && (
-                            <>
-                               <Button
-                                 variant="outline"
-                                 size="sm"
-                                 onClick={() => handleKakaoShare(question)}
-                               >
-                                 <MessageSquare className="w-4 h-4 mr-2" />
-                                 카카오톡 공유
-                               </Button>
-                            </>
-                          )}
                         </div>
                       </div>
                       <p className="text-foreground leading-relaxed">
@@ -240,6 +230,20 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
                         </div>
                       )}
                     </div>
+                  </div>
+                )}
+                
+                {/* Kakao Share Button - Always show if token exists */}
+                {question.parent_access_token && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleKakaoShare(question)}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      카카오톡 공유
+                    </Button>
                   </div>
                 )}
               </div>

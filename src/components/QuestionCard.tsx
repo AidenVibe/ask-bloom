@@ -110,7 +110,7 @@ export const QuestionList = ({ questions, enableCarousel }: QuestionListProps) =
                 </div>
               )}
 
-              {question.answer_text && question.parent_access_token && (
+              {question.parent_access_token && (
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Button
                     variant="outline"
