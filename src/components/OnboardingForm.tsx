@@ -44,6 +44,24 @@ export const OnboardingForm = () => {
     }));
   };
 
+  const validatePhoneNumber = (phone: string) => {
+    // 한국 휴대폰 번호 정규식 (010-1234-5678, 01012345678 형태)
+    const phoneRegex = /^(010-?\d{4}-?\d{4}|01[016789]-?\d{3,4}-?\d{4})$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+  };
+
+  const formatPhoneNumber = (phone: string) => {
+    // 숫자만 추출
+    const numbers = phone.replace(/[^\d]/g, '');
+    
+    // 010으로 시작하는 11자리 번호 형식화
+    if (numbers.length === 11 && numbers.startsWith('010')) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+    }
+    
+    return phone;
+  };
+
   const handleNext = async () => {
     if (step === 1 && !formData.childName) {
       toast({
@@ -55,6 +73,14 @@ export const OnboardingForm = () => {
     if (step === 2 && (!formData.parentNickname || !formData.parentContact)) {
       toast({
         title: "부모님 정보를 입력해주세요",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (step === 2 && !validatePhoneNumber(formData.parentContact)) {
+      toast({
+        title: "올바른 전화번호를 입력해주세요",
+        description: "예: 010-1234-5678",
         variant: "destructive"
       });
       return;
@@ -79,15 +105,18 @@ export const OnboardingForm = () => {
     } else {
       // 프로필 생성
       try {
+        const formattedPhone = formatPhoneNumber(formData.parentContact);
+        
         const { error } = await supabase
           .from('profiles')
           .insert({
             user_id: user?.id,
             name: formData.childName,
             role: 'child',
+            phone_number: formattedPhone,
             onboarding_data: {
               parentNickname: formData.parentNickname,
-              parentContact: formData.parentContact,
+              parentContact: formattedPhone,
               interests: formData.interests,
               preferredTime: formData.preferredTime
             }
@@ -170,6 +199,7 @@ export const OnboardingForm = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, parentContact: e.target.value }))}
                   placeholder="예: 010-1234-5678"
                   className="h-12 text-lg border-warm-coral/30 focus:border-warm-coral"
+                  maxLength={13}
                 />
                 <p className="text-sm text-warm-gray mt-1">
                   카카오톡 또는 문자로 질문을 전송해드려요
