@@ -100,7 +100,7 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-foreground">안녕하세요, {profile.name}님!</h1>
             <p className="text-warm-gray">오늘도 부모님과 따뜻한 대화를 나눠보세요</p>
           </div>
-          <Button variant="soft" size="sm">
+          <Button variant="soft" size="sm" onClick={() => navigate('/settings')}>
             <Settings className="w-4 h-4 mr-2" />
             설정
           </Button>

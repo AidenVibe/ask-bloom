@@ -47,7 +47,7 @@ export const DevSettings = () => {
   const handleClearAllData = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.rpc('clear_all_development_data');
+      const { error } = await supabase.rpc('clear_user_data', { target_user_id: user?.id });
 
       if (error) throw error;
 

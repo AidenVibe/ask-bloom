@@ -19,6 +19,7 @@ export const OnboardingForm = () => {
     childName: "",
     parentNickname: "",
     parentContact: "",
+    relationship: "",
     interests: [] as string[],
     preferredTime: ""
   });
@@ -70,9 +71,9 @@ export const OnboardingForm = () => {
       });
       return;
     }
-    if (step === 2 && (!formData.parentNickname || !formData.parentContact)) {
+    if (step === 2 && (!formData.parentNickname || !formData.parentContact || !formData.relationship)) {
       toast({
-        title: "부모님 정보를 입력해주세요",
+        title: "부모님 정보를 모두 입력해주세요",
         variant: "destructive"
       });
       return;
@@ -114,6 +115,7 @@ export const OnboardingForm = () => {
             name: formData.childName,
             role: 'child',
             phone_number: formattedPhone,
+            preferred_time: formData.preferredTime,
             onboarding_data: {
               parentNickname: formData.parentNickname,
               parentContact: formattedPhone,
@@ -123,6 +125,18 @@ export const OnboardingForm = () => {
           });
 
         if (error) throw error;
+
+        // 부모-자녀 관계 정보 저장
+        const { error: relationError } = await supabase
+          .from('parent_child_relationships')
+          .insert({
+            child_user_id: user?.id,
+            parent_name: formData.parentNickname,
+            parent_phone: formattedPhone,
+            relationship: formData.relationship
+          });
+
+        if (relationError) throw relationError;
 
         toast({
           title: "설정이 완료되었습니다!",
@@ -205,6 +219,22 @@ export const OnboardingForm = () => {
                   카카오톡 또는 문자로 질문을 전송해드려요
                 </p>
               </div>
+
+              <div>
+                <Label htmlFor="relationship" className="text-base font-medium">관계</Label>
+                <Select onValueChange={(value) => setFormData(prev => ({ ...prev, relationship: value }))}>
+                  <SelectTrigger className="h-12 text-lg border-warm-coral/30">
+                    <SelectValue placeholder="관계를 선택해주세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mother">어머니</SelectItem>
+                    <SelectItem value="father">아버지</SelectItem>
+                    <SelectItem value="grandmother">할머니</SelectItem>
+                    <SelectItem value="grandfather">할아버지</SelectItem>
+                    <SelectItem value="other">기타</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         );
@@ -276,6 +306,7 @@ export const OnboardingForm = () => {
                 <p>• 이름: {formData.childName}</p>
                 <p>• 부모님: {formData.parentNickname}</p>
                 <p>• 연락처: {formData.parentContact}</p>
+                <p>• 관계: {formData.relationship === 'mother' ? '어머니' : formData.relationship === 'father' ? '아버지' : formData.relationship === 'grandmother' ? '할머니' : formData.relationship === 'grandfather' ? '할아버지' : '기타'}</p>
                 <p>• 관심사: {formData.interests.join(", ")}</p>
                 <p>• 질문 시간: {timeOptions.find(t => t.value === formData.preferredTime)?.label}</p>
               </div>

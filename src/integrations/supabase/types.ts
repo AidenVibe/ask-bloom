@@ -22,6 +22,7 @@ export type Database = {
           parent_name: string
           parent_phone: string
           parent_user_id: string | null
+          relationship: string
           updated_at: string | null
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           parent_name: string
           parent_phone: string
           parent_user_id?: string | null
+          relationship?: string
           updated_at?: string | null
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           parent_name?: string
           parent_phone?: string
           parent_user_id?: string | null
+          relationship?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -51,6 +54,7 @@ export type Database = {
           name: string
           onboarding_data: Json | null
           phone_number: string | null
+          preferred_time: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
           user_id: string
@@ -61,6 +65,7 @@ export type Database = {
           name: string
           onboarding_data?: Json | null
           phone_number?: string | null
+          preferred_time?: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           user_id: string
@@ -71,6 +76,7 @@ export type Database = {
           name?: string
           onboarding_data?: Json | null
           phone_number?: string | null
+          preferred_time?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
           user_id?: string
