@@ -102,6 +102,13 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
       console.log('생성된 답변 링크:', answerLink);
       console.log('부모님 닉네임:', onboardingData?.parentNickname);
 
+      // 디버깅용: 실제 URL을 토스트로 보여주기
+      toast({
+        title: "디버그: 생성된 URL",
+        description: answerLink,
+        duration: 10000
+      });
+
       // 카카오톡으로 공유
       shareToKakao(selectedQuestion, answerLink, onboardingData?.parentNickname);
 
