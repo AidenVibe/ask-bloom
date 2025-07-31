@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Fetch user profile with setTimeout to avoid blocking
           setTimeout(async () => {
             try {
+              console.log('Fetching profile for user:', session.user.id);
               const { data: profileData, error } = await supabase
                 .from('profiles')
                 .select('*')
@@ -48,6 +49,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 .maybeSingle();
               
               console.log('Profile data:', profileData, 'Error:', error);
+              if (error) {
+                console.error('Profile fetch error details:', error);
+              }
               setProfile(profileData || null);
             } catch (err) {
               console.error('Profile fetch error:', err);
@@ -55,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } finally {
               setLoading(false);
             }
-          }, 0);
+          }, 100);
         } else {
           setProfile(null);
           setLoading(false);
