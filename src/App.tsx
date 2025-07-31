@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Answer from "./pages/Answer";
 import Conversations from "./pages/Conversations";
+import AllConversations from "./pages/AllConversations";
 import Auth from "./pages/Auth";
 import ViewAnswer from "./pages/ViewAnswer";
 import NotFound from "./pages/NotFound";
@@ -30,7 +31,8 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/answer" element={<Answer />} />
-          <Route path="/conversations" element={<Conversations />} />
+            <Route path="/conversations" element={<Conversations />} />
+            <Route path="/all-conversations" element={<AllConversations />} />
           <Route path="/view-answer" element={<ViewAnswer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

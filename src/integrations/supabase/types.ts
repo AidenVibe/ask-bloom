@@ -117,6 +117,8 @@ export type Database = {
         Row: {
           answer_text: string | null
           answered_at: string | null
+          child_followup_sent_at: string | null
+          child_followup_text: string | null
           child_user_id: string
           created_at: string
           id: string
@@ -130,6 +132,8 @@ export type Database = {
         Insert: {
           answer_text?: string | null
           answered_at?: string | null
+          child_followup_sent_at?: string | null
+          child_followup_text?: string | null
           child_user_id: string
           created_at?: string
           id?: string
@@ -143,6 +147,8 @@ export type Database = {
         Update: {
           answer_text?: string | null
           answered_at?: string | null
+          child_followup_sent_at?: string | null
+          child_followup_text?: string | null
           child_user_id?: string
           created_at?: string
           id?: string

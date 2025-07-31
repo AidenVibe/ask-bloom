@@ -138,7 +138,7 @@ const Dashboard = () => {
         )}
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
           <Card className="p-6 border-warm-coral/20">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-warm-coral/20 rounded-full flex items-center justify-center">
@@ -162,41 +162,28 @@ const Dashboard = () => {
               </div>
             </div>
           </Card>
-
-          <Card className="p-6 border-warm-coral/20">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">{stats.newDiscoveries}</div>
-                <div className="text-sm text-warm-gray">새로운 발견</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 border-warm-coral/20">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-foreground">{stats.consecutiveDays}일</div>
-                <div className="text-sm text-warm-gray">연속 대화</div>
-              </div>
-            </div>
-          </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="space-y-6">
-          {hasQuestions && (
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
+        {/* Quick Question Action */}
+        <Card className="p-8 mb-8 border-warm-coral/30 bg-gradient-to-r from-warm-coral/10 to-soft-peach/20">
+          <div className="text-center space-y-4">
+            <div className="w-20 h-20 bg-warm-coral/20 rounded-full flex items-center justify-center mx-auto">
+              <Heart className="w-10 h-10 text-warm-coral" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-2">새로운 질문 보내기</h3>
+              <p className="text-warm-gray mb-6">
+                부모님과 따뜻한 대화를 시작해보세요. 새로운 이야기를 발견할 수 있어요.
+              </p>
               <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
                 <DialogTrigger asChild>
-                  <Button variant="warm" size="sm">
-                    새 질문 보내기
+                  <Button 
+                    variant="warm" 
+                    size="lg"
+                    className="text-lg px-8 py-3"
+                  >
+                    <Send className="w-5 h-5 mr-2" />
+                    질문 보내기
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
@@ -204,34 +191,22 @@ const Dashboard = () => {
                 </DialogContent>
               </Dialog>
             </div>
+          </div>
+        </Card>
+
+        {/* Main Content */}
+        <div className="space-y-6">
+          {hasQuestions && (
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-foreground">최근 질문들</h2>
+              <Button variant="outline" size="sm" onClick={() => navigate('/all-conversations')}>
+                전체 보기
+              </Button>
+            </div>
           )}
-          <QuestionList questions={questions} />
+          <QuestionList questions={questions.slice(0, 5)} enableCarousel />
         </div>
 
-        {/* Quick Actions */}
-        <div className="mt-12">
-          <h3 className="text-xl font-semibold text-foreground mb-6">빠른 실행</h3>
-          <div className="grid md:grid-cols-1 gap-6 max-w-md">
-            <Dialog open={showQuestionSelector} onOpenChange={setShowQuestionSelector}>
-              <DialogTrigger asChild>
-                <Card className="p-6 border-warm-coral/20 hover:shadow-lg transition-all cursor-pointer">
-                  <div className="text-center space-y-4">
-                    <div className="w-16 h-16 bg-warm-coral/20 rounded-full flex items-center justify-center mx-auto">
-                      <Heart className="w-8 h-8 text-warm-coral" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">즉시 질문하기</h4>
-                      <p className="text-sm text-warm-gray">지금 바로 새로운 질문을 보내세요</p>
-                    </div>
-                  </div>
-                </Card>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <QuestionSelector onQuestionSent={handleQuestionSent} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
 
         {/* 개발자 설정 */}
         <div className="mt-12">
