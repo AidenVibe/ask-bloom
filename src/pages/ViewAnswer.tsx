@@ -248,7 +248,7 @@ const ViewAnswer = () => {
                         </div>
                       </div>
                     ) : (
-                      !accessToken && user && question.child_user_id === user.id && (
+                      user && question.child_user_id === user.id && (
                         <div className="space-y-4">
                           <div className="text-center">
                             <p className="text-warm-gray mb-4">
