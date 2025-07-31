@@ -216,10 +216,10 @@ const Dashboard = () => {
             <div className="space-y-2">
               <div>
                 <Link 
-                  to="/answer?q=test&t=test" 
+                  to="/answer?q=751ff025-a225-4a0e-8869-f7c0b756c1bc&t=c36226a3d7da415dfd77b300158defd7" 
                   className="text-blue-600 hover:text-blue-800 underline"
                 >
-                  답변 페이지 테스트 (q=test&t=test)
+                  답변 페이지 테스트 (실제 질문)
                 </Link>
               </div>
               <div className="text-sm text-gray-600">
