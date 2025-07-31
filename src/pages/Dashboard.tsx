@@ -1,18 +1,46 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { QuestionList } from "@/components/QuestionCard";
 import { DiscoveryGallery } from "@/components/DiscoveryCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Dashboard = () => {
+  const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        navigate('/auth');
+      } else if (!profile) {
+        navigate('/onboarding');
+      }
+    }
+  }, [user, profile, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-soft-peach via-cream to-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">안녕하세요, 민지님!</h1>
+            <h1 className="text-3xl font-bold text-foreground">안녕하세요, {profile.name}님!</h1>
             <p className="text-warm-gray">오늘도 부모님과 따뜻한 대화를 나눠보세요</p>
           </div>
           <Button variant="soft" size="sm">
