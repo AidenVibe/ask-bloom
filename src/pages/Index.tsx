@@ -6,14 +6,16 @@ import { Testimonials } from "@/components/Testimonials";
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && profile) {
       navigate('/dashboard');
+    } else if (!loading && user && !profile) {
+      navigate('/onboarding');
     }
-  }, [user, loading, navigate]);
+  }, [user, profile, loading, navigate]);
 
   if (loading) {
     return (
