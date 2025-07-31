@@ -49,6 +49,7 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
+          onboarding_data: Json | null
           phone_number: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
@@ -58,6 +59,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           name: string
+          onboarding_data?: Json | null
           phone_number?: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
@@ -67,6 +69,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+          onboarding_data?: Json | null
           phone_number?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
