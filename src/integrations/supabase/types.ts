@@ -154,13 +154,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      clear_all_development_data: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
       clear_user_data: {
         Args: { target_user_id: string }
         Returns: undefined
+      }
+      validate_parent_session: {
+        Args: { token: string }
+        Returns: {
+          valid: boolean
+          user_id: string
+          parent_id: string
+          parent_name: string
+          expires_at: string
+        }[]
       }
     }
     Enums: {
