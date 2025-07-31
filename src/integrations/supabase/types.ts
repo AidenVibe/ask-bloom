@@ -114,6 +114,7 @@ export type Database = {
           child_user_id: string
           created_at: string
           id: string
+          parent_access_token: string | null
           parent_user_id: string | null
           question_text: string
           sent_at: string
@@ -126,6 +127,7 @@ export type Database = {
           child_user_id: string
           created_at?: string
           id?: string
+          parent_access_token?: string | null
           parent_user_id?: string | null
           question_text: string
           sent_at?: string
@@ -138,6 +140,7 @@ export type Database = {
           child_user_id?: string
           created_at?: string
           id?: string
+          parent_access_token?: string | null
           parent_user_id?: string | null
           question_text?: string
           sent_at?: string

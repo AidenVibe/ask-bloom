@@ -64,19 +64,39 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("로그인이 필요합니다");
 
-      const { error } = await supabase
+      // 질문을 DB에 저장하고 parent_access_token 자동 생성
+      const { data: questionData, error: questionError } = await supabase
         .from('questions')
         .insert({
           child_user_id: user.id,
           question_text: selectedQuestion,
           status: 'sent'
-        });
+        })
+        .select('id, parent_access_token')
+        .single();
 
-      if (error) throw error;
+      if (questionError) throw questionError;
+
+      // 부모 정보 조회
+      const { data: parentData, error: parentError } = await supabase
+        .from('parent_child_relationships')
+        .select('parent_name, parent_phone')
+        .eq('child_user_id', user.id)
+        .single();
+
+      if (parentError || !parentData) {
+        throw new Error("부모님 정보를 찾을 수 없습니다. 온보딩을 완료해주세요.");
+      }
+
+      // 답변 링크 생성
+      const answerLink = `${window.location.origin}/answer?q=${questionData.id}&t=${questionData.parent_access_token}`;
+
+      console.log('생성된 답변 링크:', answerLink);
+      console.log('부모님 전화번호:', parentData.parent_phone);
 
       toast({
         title: "질문을 전송했습니다! 📱",
-        description: "부모님께 곧 질문이 전달됩니다"
+        description: `${parentData.parent_name}님께 카카오톡으로 질문이 전달됩니다`
       });
 
       onQuestionSent();
@@ -84,6 +104,7 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
       console.error('Error sending question:', error);
       toast({
         title: "질문 전송 중 오류가 발생했습니다",
+        description: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다",
         variant: "destructive"
       });
     } finally {
