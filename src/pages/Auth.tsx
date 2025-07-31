@@ -118,6 +118,28 @@ const Auth = () => {
     }
   };
 
+  const handleKakaoLogin = async () => {
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "카카오 로그인 오류",
+        description: error.message
+      });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 p-4">
       <Card className="w-full max-w-md">
@@ -135,6 +157,23 @@ const Auth = () => {
             </TabsList>
 
             <TabsContent value="signin" className="space-y-4">
+              <Button 
+                onClick={handleKakaoLogin} 
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium"
+                disabled={loading}
+              >
+                {loading ? "로그인 중..." : "카카오로 로그인"}
+              </Button>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">또는</span>
+                </div>
+              </div>
+
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">이메일</Label>
