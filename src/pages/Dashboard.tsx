@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { DevSettings } from "@/components/DevSettings";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const { user, profile, loading } = useAuth();
@@ -210,6 +211,22 @@ const Dashboard = () => {
 
         {/* 개발자 설정 */}
         <div className="mt-12">
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="font-semibold text-yellow-800 mb-2">🔧 디버깅 테스트</h3>
+            <div className="space-y-2">
+              <div>
+                <Link 
+                  to="/answer?q=test&t=test" 
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  답변 페이지 테스트 (q=test&t=test)
+                </Link>
+              </div>
+              <div className="text-sm text-gray-600">
+                ↑ 이 링크를 클릭해서 Answer 페이지가 정상적으로 로드되는지 확인해주세요
+              </div>
+            </div>
+          </div>
           <DevSettings />
         </div>
       </div>
