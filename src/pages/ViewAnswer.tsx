@@ -35,7 +35,12 @@ const ViewAnswer = () => {
       }
 
       try {
-        let query = supabase
+        // accessToken이 있을 때는 익명 클라이언트 사용 (부모님 접근용)
+        const client = accessToken ? 
+          supabase : // 이미 익명 키 사용 중
+          supabase;
+
+        let query = client
           .from('questions')
           .select('*, child_followup_text, child_followup_sent_at')
           .eq('id', questionId);
@@ -58,7 +63,10 @@ const ViewAnswer = () => {
         setQuestion(questionData);
       } catch (error) {
         console.error('질문 로드 실패:', error);
-        setError("질문을 불러오는 중 오류가 발생했습니다.");
+        console.error('questionId:', questionId);
+        console.error('accessToken:', accessToken);
+        console.error('user:', user);
+        setError(`질문을 불러오는 중 오류가 발생했습니다. ${error.message || '알 수 없는 오류'}`);
       } finally {
         setLoading(false);
       }
@@ -239,7 +247,7 @@ const ViewAnswer = () => {
                           )}
                         </div>
                       </div>
-                    ) : !question.child_followup_text && (
+                    ) : !question.child_followup_text && !accessToken && user && question.child_user_id === user.id && (
                       <div className="space-y-4">
                         <div className="text-center">
                           <p className="text-warm-gray mb-4">
