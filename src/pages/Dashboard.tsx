@@ -45,7 +45,7 @@ const Dashboard = () => {
     try {
       const { data, error } = await supabase
         .from('questions')
-        .select('*')
+        .select('*, parent_access_token')
         .eq('child_user_id', user?.id)
         .order('created_at', { ascending: false });
 

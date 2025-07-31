@@ -9,6 +9,8 @@ interface QuestionCardProps {
   date: string;
   isAnswered: boolean;
   answerText?: string;
+  questionId?: string;
+  parentAccessToken?: string;
   onAnswer?: () => void;
   onViewAnswer?: () => void;
 }
@@ -18,6 +20,8 @@ export const QuestionCard = ({
   date, 
   isAnswered, 
   answerText,
+  questionId,
+  parentAccessToken,
   onAnswer, 
   onViewAnswer 
 }: QuestionCardProps) => {
@@ -62,7 +66,7 @@ export const QuestionCard = ({
         </div>
 
         {/* Action */}
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
           {isAnswered ? (
             <Button 
               variant="soft" 
@@ -84,6 +88,18 @@ export const QuestionCard = ({
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
+          
+          {/* 개발 환경용 부모 답변 링크 */}
+          {questionId && parentAccessToken && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.open(`/answer?q=${questionId}&t=${parentAccessToken}`, '_blank')}
+              className="w-full"
+            >
+              🔧 부모 답변 링크 (개발용)
+            </Button>
+          )}
         </div>
       </div>
     </Card>
@@ -99,6 +115,7 @@ interface QuestionListProps {
     answer_text?: string;
     answered_at?: string;
     status: string;
+    parent_access_token?: string;
   }>;
 }
 
@@ -124,6 +141,8 @@ export const QuestionList = ({ questions }: QuestionListProps) => {
           date={q.sent_at}
           isAnswered={!!q.answer_text}
           answerText={q.answer_text}
+          questionId={q.id}
+          parentAccessToken={q.parent_access_token}
           onAnswer={() => console.log(`답변 확인: ${q.id}`)}
           onViewAnswer={() => console.log(`상세 보기: ${q.id}`)}
         />
