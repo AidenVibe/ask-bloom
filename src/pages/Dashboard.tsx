@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageCircle, Sparkles, Settings, Calendar, Heart, TrendingUp, Send } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { DevSettings } from "@/components/DevSettings";
 import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -272,6 +273,11 @@ const Dashboard = () => {
               </div>
             </Card>
           </div>
+        </div>
+
+        {/* 개발자 설정 */}
+        <div className="mt-12">
+          <DevSettings />
         </div>
       </div>
     </div>

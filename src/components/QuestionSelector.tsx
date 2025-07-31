@@ -64,6 +64,23 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("로그인이 필요합니다");
 
+      // 프로필에서 온보딩 데이터 확인
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('onboarding_data')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError || !profileData?.onboarding_data) {
+        throw new Error("프로필 정보를 찾을 수 없습니다. 온보딩을 완료해주세요.");
+      }
+
+      const onboardingData = profileData.onboarding_data as any;
+      
+      if (!onboardingData?.parentContact || !onboardingData?.parentNickname) {
+        throw new Error("부모님 정보가 완전하지 않습니다. 온보딩을 다시 완료해주세요.");
+      }
+
       // 질문을 DB에 저장하고 parent_access_token 자동 생성
       const { data: questionData, error: questionError } = await supabase
         .from('questions')
@@ -77,26 +94,16 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
 
       if (questionError) throw questionError;
 
-      // 부모 정보 조회
-      const { data: parentData, error: parentError } = await supabase
-        .from('parent_child_relationships')
-        .select('parent_name, parent_phone')
-        .eq('child_user_id', user.id)
-        .single();
-
-      if (parentError || !parentData) {
-        throw new Error("부모님 정보를 찾을 수 없습니다. 온보딩을 완료해주세요.");
-      }
-
       // 답변 링크 생성
       const answerLink = `${window.location.origin}/answer?q=${questionData.id}&t=${questionData.parent_access_token}`;
 
       console.log('생성된 답변 링크:', answerLink);
-      console.log('부모님 전화번호:', parentData.parent_phone);
+      console.log('부모님 전화번호:', onboardingData?.parentContact);
+      console.log('부모님 닉네임:', onboardingData?.parentNickname);
 
       toast({
         title: "질문을 전송했습니다! 📱",
-        description: `${parentData.parent_name}님께 카카오톡으로 질문이 전달됩니다`
+        description: `${onboardingData?.parentNickname}님께 카카오톡으로 질문이 전달됩니다`
       });
 
       onQuestionSent();

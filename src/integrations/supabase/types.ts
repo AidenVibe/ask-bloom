@@ -154,7 +154,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      clear_all_development_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      clear_user_data: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       user_role: "child" | "parent"
