@@ -57,8 +57,10 @@ export const AnswerForm = ({
     setIsSubmitting(true);
     
     try {
+      console.log('Updating question:', { questionId, accessToken, answer: answer.trim() });
+      
       // 질문에 답변 저장
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('questions')
         .update({
           answer_text: answer.trim(),
@@ -66,16 +68,23 @@ export const AnswerForm = ({
           status: 'answered'
         })
         .eq('id', questionId)
-        .eq('parent_access_token', accessToken);
+        .eq('parent_access_token', accessToken)
+        .select();
+
+      console.log('Update result:', { data, error });
 
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error('질문을 찾을 수 없습니다');
+      }
 
       toast({
         title: "답변이 전송되었습니다! 💌",
         description: "소중한 이야기를 공유해주셔서 감사해요"
       });
       
-      // 답변 후 질문&답변 목록 페이지로 이동
+      // 답변 후 오늘의 질문&답변 페이지로 이동
       setTimeout(() => {
         navigate(`/conversations?t=${accessToken}`);
       }, 1500);

@@ -143,8 +143,8 @@ export const QuestionList = ({ questions }: QuestionListProps) => {
           answerText={q.answer_text}
           questionId={q.id}
           parentAccessToken={q.parent_access_token}
-          onAnswer={() => console.log(`답변 확인: ${q.id}`)}
-          onViewAnswer={() => console.log(`상세 보기: ${q.id}`)}
+          onAnswer={() => window.open(`/view-answer?q=${q.id}`, '_blank')}
+          onViewAnswer={() => window.open(`/view-answer?q=${q.id}`, '_blank')}
         />
       ))}
     </div>

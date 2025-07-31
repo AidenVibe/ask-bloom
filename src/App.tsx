@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Answer from "./pages/Answer";
 import Conversations from "./pages/Conversations";
 import Auth from "./pages/Auth";
+import ViewAnswer from "./pages/ViewAnswer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +28,8 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/answer" element={<Answer />} />
-            <Route path="/conversations" element={<Conversations />} />
+          <Route path="/conversations" element={<Conversations />} />
+          <Route path="/view-answer" element={<ViewAnswer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

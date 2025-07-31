@@ -25,11 +25,18 @@ const Conversations = () => {
       }
 
       try {
-        // 해당 access token과 연관된 질문들 조회
+        // 해당 access token과 연관된 오늘의 질문들 조회
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
           .select('*')
           .eq('parent_access_token', accessToken)
+          .gte('created_at', today.toISOString())
+          .lt('created_at', tomorrow.toISOString())
           .order('created_at', { ascending: false });
 
         if (questionsError) throw questionsError;
@@ -103,10 +110,10 @@ const Conversations = () => {
               <Heart className="w-8 h-8 text-warm-coral" />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              {childName}님과의 대화
+              오늘의 대화
             </h1>
             <p className="text-warm-gray">
-              지금까지 나눈 소중한 이야기들을 확인해보세요
+              {childName}님과 오늘 주고받은 소중한 이야기입니다
             </p>
           </div>
 
