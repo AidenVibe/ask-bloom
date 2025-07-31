@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +12,8 @@ import { Heart, ArrowRight, Users, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export const OnboardingForm = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     childName: "",
@@ -39,7 +44,7 @@ export const OnboardingForm = () => {
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && !formData.childName) {
       toast({
         title: "이름을 입력해주세요",
@@ -61,15 +66,52 @@ export const OnboardingForm = () => {
       });
       return;
     }
+    if (step === 4 && !formData.preferredTime) {
+      toast({
+        title: "선호 시간을 선택해주세요",
+        variant: "destructive"
+      });
+      return;
+    }
     
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // 완료 처리
-      toast({
-        title: "설정이 완료되었습니다!",
-        description: "내일 아침 첫 번째 질문을 전송드릴게요 💌"
-      });
+      // 프로필 생성
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user?.id,
+            name: formData.childName,
+            role: 'child',
+            onboarding_data: {
+              parentNickname: formData.parentNickname,
+              parentContact: formData.parentContact,
+              interests: formData.interests,
+              preferredTime: formData.preferredTime
+            }
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "설정이 완료되었습니다!",
+          description: "내일 아침 첫 번째 질문을 전송드릴게요 💌"
+        });
+
+        // 대시보드로 이동
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      } catch (error) {
+        console.error('Profile creation error:', error);
+        toast({
+          title: "오류가 발생했습니다",
+          description: "다시 시도해주세요",
+          variant: "destructive"
+        });
+      }
     }
   };
 
