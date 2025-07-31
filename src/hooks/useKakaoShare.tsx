@@ -21,27 +21,19 @@ export const useKakaoShare = () => {
       return;
     }
 
-    // URL에서 questionId와 accessToken 추출
-    const url = new URL(answerUrl);
-    const questionId = url.searchParams.get('id');
-    const accessToken = url.searchParams.get('token');
-    
-    // 답변 페이지 URL 생성
-    const answerPageUrl = `${window.location.origin}/answer?q=${questionId}&t=${accessToken}`;
-
     window.Kakao.Share.sendDefault({
       objectType: 'text',
       text: `💌 ${parentName}님께 질문이 도착했어요!\n\n"${question}"\n\n아래 링크를 눌러 답변을 남겨주세요 💕`,
       link: {
-        mobileWebUrl: answerPageUrl,
-        webUrl: answerPageUrl,
+        mobileWebUrl: answerUrl,
+        webUrl: answerUrl,
       },
       buttons: [
         {
           title: '답변하기',
           link: {
-            mobileWebUrl: answerPageUrl,
-            webUrl: answerPageUrl,
+            mobileWebUrl: answerUrl,
+            webUrl: answerUrl,
           },
         },
       ],
