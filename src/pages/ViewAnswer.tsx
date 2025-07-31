@@ -217,32 +217,8 @@ const ViewAnswer = () => {
                   </div>
                 )}
 
-                {/* Parent View: Show followup response if exists */}
-                {accessToken && question.child_followup_text && question.answer_text && (
-                  <div className="mt-8 border-t pt-6">
-                    <div className="flex items-start gap-4 bg-blue-50 p-4 rounded-lg">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Reply className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm text-blue-600 font-medium mb-2">
-                          💬 아이의 꼬리 답변
-                        </div>
-                        <p className="text-foreground leading-relaxed">
-                          {question.child_followup_text}
-                        </p>
-                        {question.child_followup_sent_at && (
-                          <div className="text-xs text-warm-gray mt-2">
-                            {format(new Date(question.child_followup_sent_at), "M월 d일 HH:mm", { locale: ko })}에 전송됨
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Child Follow-up Response (when accessed by child) */}
-                {user && question.child_user_id === user.id && question.answer_text && (
+                {/* Follow-up Response Section */}
+                {question.answer_text && (
                   <div className="mt-8 border-t pt-6">
                     {question.child_followup_text ? (
                       <div className="flex items-start gap-4 bg-blue-50 p-4 rounded-lg">
@@ -250,8 +226,8 @@ const ViewAnswer = () => {
                           <Reply className="w-5 h-5 text-blue-600" />
                         </div>
                         <div className="flex-1">
-                          <div className="text-sm text-blue-600 font-medium mb-2">
-                            💬 나의 꼬리 답변
+                         <div className="text-sm text-blue-600 font-medium mb-2">
+                            💬 {accessToken ? "아이의 꼬리 답변" : "나의 꼬리 답변"}
                           </div>
                           <p className="text-foreground leading-relaxed">
                             {question.child_followup_text}
