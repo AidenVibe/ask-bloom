@@ -2,11 +2,12 @@ import { useCallback, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, MessageCircle, Heart, Clock, Reply, Copy, Check, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircle, Heart, Clock, Reply, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { useKakaoShare } from "@/hooks/useKakaoShare";
 
 interface QuestionCarouselProps {
   questions: any[];
@@ -14,7 +15,7 @@ interface QuestionCarouselProps {
 
 export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
   const navigate = useNavigate();
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { shareToKakao } = useKakaoShare();
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     loop: false,
     align: "start",
@@ -29,27 +30,17 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
-  const copyAnswerLink = async (question: any) => {
+  const handleKakaoShare = (question: any) => {
     if (!question.parent_access_token) return;
     
-    const link = `${window.location.origin}/view-answer?id=${question.id}&token=${question.parent_access_token}`;
+    const answerUrl = `${window.location.origin}/view-answer?id=${question.id}&token=${question.parent_access_token}`;
     
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopiedId(question.id);
-      toast({
-        title: "링크가 복사되었습니다",
-        description: "부모님께 이 링크를 공유해주세요.",
-      });
-      
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch (error) {
-      toast({
-        title: "복사 실패",
-        description: "링크 복사에 실패했습니다.",
-        variant: "destructive"
-      });
-    }
+    shareToKakao(question.question_text, answerUrl, "부모님");
+    
+    toast({
+      title: "카카오톡 공유",
+      description: "부모님께 카카오톡으로 공유했습니다.",
+    });
   };
 
   const handleViewDetails = (question: any) => {
@@ -134,34 +125,15 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
                               </Button>
                               {question.parent_access_token && (
                                 <>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 px-3 text-xs"
-                                    onClick={() => copyAnswerLink(question)}
-                                    disabled={copiedId === question.id}
-                                  >
-                                    {copiedId === question.id ? (
-                                      <>
-                                        <Check className="w-3 h-3 mr-1" />
-                                        복사됨
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Copy className="w-3 h-3 mr-1" />
-                                        링크 복사
-                                      </>
-                                    )}
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 px-3 text-xs"
-                                    onClick={() => window.open(`/view-answer?id=${question.id}&token=${question.parent_access_token}`, '_blank')}
-                                  >
-                                    <ExternalLink className="w-3 h-3 mr-1" />
-                                    새창
-                                  </Button>
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     className="h-8 px-3 text-xs"
+                                     onClick={() => handleKakaoShare(question)}
+                                   >
+                                     <MessageSquare className="w-3 h-3 mr-1" />
+                                     카카오톡
+                                   </Button>
                                 </>
                               )}
                             </div>
@@ -247,32 +219,14 @@ export const QuestionCarousel = ({ questions }: QuestionCarouselProps) => {
                           </Button>
                           {question.parent_access_token && (
                             <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => copyAnswerLink(question)}
-                                disabled={copiedId === question.id}
-                              >
-                                {copiedId === question.id ? (
-                                  <>
-                                    <Check className="w-4 h-4 mr-2" />
-                                    복사됨
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="w-4 h-4 mr-2" />
-                                    링크 복사
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.open(`/view-answer?id=${question.id}&token=${question.parent_access_token}`, '_blank')}
-                              >
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                새창에서 보기
-                              </Button>
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 onClick={() => handleKakaoShare(question)}
+                               >
+                                 <MessageSquare className="w-4 h-4 mr-2" />
+                                 카카오톡 공유
+                               </Button>
                             </>
                           )}
                         </div>

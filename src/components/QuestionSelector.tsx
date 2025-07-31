@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Send, Heart } from "lucide-react";
+import { RefreshCw, Send, Heart, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useKakaoShare } from "@/hooks/useKakaoShare";
 
 interface QuestionTemplate {
   id: string;
@@ -21,6 +22,7 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const { shareToKakao } = useKakaoShare();
 
   const fetchRandomQuestions = async () => {
     setLoading(true);
@@ -98,8 +100,10 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
       const answerLink = `${window.location.origin}/answer?q=${questionData.id}&t=${questionData.parent_access_token}`;
 
       console.log('생성된 답변 링크:', answerLink);
-      console.log('부모님 전화번호:', onboardingData?.parentContact);
       console.log('부모님 닉네임:', onboardingData?.parentNickname);
+
+      // 카카오톡으로 공유
+      shareToKakao(selectedQuestion, answerLink, onboardingData?.parentNickname);
 
       toast({
         title: "질문을 전송했습니다! 📱",
@@ -186,8 +190,8 @@ export const QuestionSelector = ({ onQuestionSent }: QuestionSelectorProps) => {
           disabled={!selectedQuestion || sending}
           className="flex-1"
         >
-          <Send className="w-4 h-4 mr-2" />
-          {sending ? "전송 중..." : "질문 보내기"}
+          <MessageSquare className="w-4 h-4 mr-2" />
+          {sending ? "전송 중..." : "카카오톡으로 보내기"}
         </Button>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useKakaoShare } from "@/hooks/useKakaoShare";
 
 const ViewAnswer = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ const ViewAnswer = () => {
   const [followupText, setFollowupText] = useState("");
   const [isSubmittingFollowup, setIsSubmittingFollowup] = useState(false);
   const [showFollowupForm, setShowFollowupForm] = useState(false);
+  const { shareFollowUpToKakao } = useKakaoShare();
 
   const questionId = searchParams.get('id') || searchParams.get('q');
   const accessToken = searchParams.get('token');
@@ -80,9 +82,21 @@ const ViewAnswer = () => {
 
       if (error) throw error;
 
+      // 카카오톡으로 꼬리답변 알림 전송
+      if (question.answer_text && accessToken) {
+        const answerUrl = `${window.location.origin}/view-answer?id=${questionId}&token=${accessToken}`;
+        shareFollowUpToKakao(
+          question.question_text,
+          question.answer_text,
+          followupText.trim(),
+          answerUrl,
+          "부모님"
+        );
+      }
+
       toast({
         title: "꼬리 답변이 전송되었습니다",
-        description: "부모님께서 확인하실 수 있어요."
+        description: "부모님께 카카오톡으로 알림이 전송됩니다."
       });
 
       // 질문 데이터 새로고침

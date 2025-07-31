@@ -1,11 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Heart, Clock, Eye, Copy, Check, ExternalLink } from "lucide-react";
+import { MessageCircle, Heart, Clock, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { QuestionCarousel } from "./QuestionCarousel";
+import { useKakaoShare } from "@/hooks/useKakaoShare";
 
 interface Question {
   id: string;
@@ -22,29 +23,19 @@ interface QuestionListProps {
 }
 
 export const QuestionList = ({ questions, enableCarousel }: QuestionListProps) => {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { shareToKakao } = useKakaoShare();
 
-  const copyAnswerLink = async (question: Question) => {
+  const handleKakaoShare = (question: Question) => {
     if (!question.parent_access_token) return;
     
-    const link = `${window.location.origin}/view-answer?id=${question.id}&token=${question.parent_access_token}`;
+    const answerUrl = `${window.location.origin}/view-answer?id=${question.id}&token=${question.parent_access_token}`;
     
-    try {
-      await navigator.clipboard.writeText(link);
-      setCopiedId(question.id);
-      toast({
-        title: "링크가 복사되었습니다",
-        description: "부모님께 이 링크를 공유해주세요.",
-      });
-      
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch (error) {
-      toast({
-        title: "복사 실패",
-        description: "링크 복사에 실패했습니다.",
-        variant: "destructive"
-      });
-    }
+    shareToKakao(question.question_text, answerUrl, "부모님");
+    
+    toast({
+      title: "카카오톡 공유",
+      description: "부모님께 카카오톡으로 공유했습니다.",
+    });
   };
 
   if (!questions || questions.length === 0) {
@@ -124,28 +115,10 @@ export const QuestionList = ({ questions, enableCarousel }: QuestionListProps) =
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyAnswerLink(question)}
-                    disabled={copiedId === question.id}
+                    onClick={() => handleKakaoShare(question)}
                   >
-                    {copiedId === question.id ? (
-                      <>
-                        <Check className="w-4 h-4 mr-2" />
-                        복사됨
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-2" />
-                        링크 복사
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(`/view-answer?id=${question.id}&token=${question.parent_access_token}`, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    새 탭에서 보기
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    카카오톡 공유
                   </Button>
                 </div>
               )}
