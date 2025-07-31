@@ -38,21 +38,20 @@ const Answer = () => {
           return;
         }
 
-        // 부모 정보 조회
+        // 부모 정보 조회 (개발 환경에서는 선택사항)
         const { data: parentData, error: parentError } = await supabase
           .from('parent_child_relationships')
           .select('parent_name')
           .eq('child_user_id', questionData.child_user_id)
           .single();
 
-        if (parentError || !parentData) {
-          setError("부모 정보를 찾을 수 없습니다.");
-          setLoading(false);
-          return;
+        // 부모 정보가 없어도 계속 진행 (개발 환경용)
+        if (parentError && parentError.code !== 'PGRST116') {
+          console.warn('부모 정보 조회 실패:', parentError);
         }
 
         setQuestion(questionData.question_text);
-        setParentName(parentData.parent_name);
+        setParentName(parentData?.parent_name || "부모님"); // 기본값 설정
       } catch (error) {
         console.error('질문 로드 실패:', error);
         setError("질문을 불러오는 중 오류가 발생했습니다.");
