@@ -94,6 +94,12 @@ const ViewAnswer = () => {
       // 카카오톡으로 꼬리답변 알림 전송 (답변이 있을 때만)
       if (question.answer_text && question.parent_access_token) {
         const answerUrl = `${window.location.origin}/view-answer?id=${questionId}&token=${question.parent_access_token}`;
+        console.log('꼬리답변 카카오톡 공유 시작');
+        console.log('- 질문:', question.question_text);
+        console.log('- 부모 답변:', question.answer_text);
+        console.log('- 꼬리답변:', followupText.trim());
+        console.log('- 공유 URL:', answerUrl);
+        
         shareFollowUpToKakao(
           question.question_text,
           question.answer_text,
