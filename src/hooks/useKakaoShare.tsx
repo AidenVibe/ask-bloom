@@ -49,9 +49,10 @@ export const useKakaoShare = () => {
     // 꼬리답변의 경우 오늘의 대화 페이지로 이동하도록 URL 수정
     console.log('Original answerUrl:', answerUrl);
     
-    // URL에서 기본 도메인을 가져와서 /conversations 경로로 새로 구성
+    // URL에서 token 파라미터를 t로 변경하고 conversations 경로로 수정
     const url = new URL(answerUrl);
-    const conversationsUrl = `${url.origin}/conversations${url.search}`;
+    const token = url.searchParams.get('token');
+    const conversationsUrl = `${url.origin}/conversations?t=${token}`;
     
     console.log('Modified conversationsUrl:', conversationsUrl);
 
